@@ -125,4 +125,4 @@ The project is split up into a few separate modules:
 
 ## License
 
-DirtCore is licensed under a private license.
+DirtCore is licensed under the MIT license.
