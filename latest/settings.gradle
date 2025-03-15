@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.parchmentmc.org' }
+        maven { url = 'https://maven.neoforged.net/releases' }
+    }
+}
+
+rootProject.name = 'latest'
+
+include(
+        'forge_1_20_1',
+        'forge_1_20_1:loader',
+        'neoforge_1_21_1',
+        'neoforge_1_21_1:loader',
+        'neoforge_1_21_1:neoforge-api'
+)
+
+includeBuild(path_prefix) {
+    dependencySubstitution {
+        substitute module('net.dirtcraft:api') using project(':api')
+        substitute module('net.dirtcraft:common') using project(':common')
+        substitute module('net.dirtcraft:common-loader-utils') using project(':common:loader-utils')
+    }
+}

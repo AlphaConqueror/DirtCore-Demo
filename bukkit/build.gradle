@@ -1,0 +1,63 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    implementation project(':common')
+    compileOnly project(':common:loader-utils')
+
+    compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
+    compileOnly 'net.kyori:adventure-text-serializer-bungeecord:4.1.0'
+}
+
+tasks.register('processSource', Sync) {
+    outputs.upToDateWhen { false }
+    from sourceSets.main.java
+
+    filter(ReplaceTokens,
+            tokens: [
+                    mod_id  : project.ext.modId,
+                    mod_name: project.ext.modName,
+                    version : project.ext.fullVersion
+            ]
+    )
+
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
+shadowJar {
+    archiveFileName = "DirtCore-Bukkit.jarinjar"
+
+    dependencies {
+        include(dependency('net.dirtcraft:.*'))
+        include(dependency('de.alphaconqueror:.*'))
+    }
+
+    relocate 'net.bytebuddy', 'net.dirtcraft.dirtcore.lib.bytebuddy'
+    relocate 'net.kyori.adventure', 'net.dirtcraft.dirtcore.lib.adventure'
+    relocate 'net.kyori.event', 'net.dirtcraft.dirtcore.lib.event'
+    relocate 'com.github.benmanes.caffeine', 'net.dirtcraft.dirtcore.lib.caffeine'
+    relocate 'com.zaxxer.hikari', 'net.dirtcraft.dirtcore.lib.hikari'
+    relocate 'com.typesafe', 'net.dirtcraft.dirtcore.lib.typesafe'
+    relocate 'de.alphaconqueror', 'net.dirtcraft.dirtcore.lib.alphaconqueror'
+    relocate 'net.dv8tion.jda', 'net.dirtcraft.dirtcore.lib.jda'
+    relocate 'ninja.leaping.configurate', 'net.dirtcraft.dirtcore.lib.configurate'
+    relocate 'org.mariadb.jdbc', 'net.dirtcraft.dirtcore.lib.mariadb'
+}
+
+artifacts {
+    archives shadowJar
+}

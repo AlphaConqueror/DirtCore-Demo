@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net/' }
+    }
+}
+
+rootProject.name = 'legacy'
+
+include(
+        'forge-legacy-utils',
+        'forge_1_7_10',
+        'forge_1_7_10:forge-api',
+        'forge_1_7_10:loader',
+        'forge_1_12_2',
+        'forge_1_12_2:forge-api',
+        'forge_1_12_2:loader'
+)
+
+includeBuild(path_prefix) {
+    dependencySubstitution {
+        substitute module('net.dirtcraft:api') using project(':api')
+        substitute module('net.dirtcraft:common') using project(':common')
+        substitute module('net.dirtcraft:common-loader-utils') using project(':common:loader-utils')
+    }
+}

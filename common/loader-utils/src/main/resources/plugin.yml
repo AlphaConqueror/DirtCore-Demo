@@ -1,0 +1,14 @@
+name: ${mod_name}
+version: ${version}
+description: ${mod_description}
+author: ${mod_authors}
+main: net.dirtcraft.dirtcore.bukkit.loader.BukkitLoaderPlugin
+load: STARTUP
+
+# Mark the plugin as 1.13 compatible to avoid CB having to perform quite as much unnecessary
+# remapping when the plugin is loaded. Note that despite what this setting might otherwise imply,
+# DirtCore is still compatible with pre-1.13 releases.
+api-version: 1.13
+
+# Soft depend on LuckPerms for permission handling.
+softdepend: [ LuckPerms ]

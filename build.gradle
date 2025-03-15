@@ -1,0 +1,56 @@
+plugins {
+    id 'java-library'
+    id 'org.cadixdev.licenser' version '0.6.1' apply false
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+apply from: 'config.gradle'
+
+final def projects = ['latest', 'legacy'];
+final def isWindows = System.getProperty('os.name').toLowerCase().contains('win')
+final def gradleCmd = isWindows ? 'gradlew.bat' : './gradlew'
+
+projects.forEach { projectName ->
+    tasks.register("build${projectName.capitalize()}") {
+        description = "Builds the ${projectName} project."
+        group = 'build'
+
+        doLast {
+            exec {
+                commandLine gradleCmd, 'build'
+                workingDir = file(projectName)
+            }
+        }
+    }
+
+    tasks.register("clean${projectName.capitalize()}") {
+        description = "Cleans the ${projectName} project."
+        group = 'build'
+
+        doLast {
+            exec {
+                commandLine gradleCmd, 'clean'
+                workingDir = file(projectName)
+            }
+        }
+    }
+}
+
+tasks.register("buildExternal") {
+    description = "Builds external projects."
+    group = 'build'
+
+    dependsOn projects.collect { tasks.named("build${it.capitalize()}") }
+}
+
+tasks.register("cleanExternal") {
+    description = "Cleans external projects."
+    group = 'build'
+
+    dependsOn projects.collect { tasks.named("clean${it.capitalize()}") }
+}

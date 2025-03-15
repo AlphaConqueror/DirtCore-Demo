@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.dirtcraft.dirtcore.forge_1_12_2.loader.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "dirtcore.refmap.json",
+  "mixins": [
+    "MixinBlockPistonBase",
+    "MixinContainer",
+    "MixinContainerAccessor",
+    "MixinForgeHooks",
+    "MixinNetHandlerPlayServer",
+    "MixinPlayerLoginNegotiation",
+    "MixinWorld"
+  ],
+  "client": []
+}

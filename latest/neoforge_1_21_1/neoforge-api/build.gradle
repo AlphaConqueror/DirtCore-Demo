@@ -1,0 +1,9 @@
+plugins {
+    alias(libs.plugins.neoforgeduserdev)
+    alias(libs.plugins.shadow)
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neo_version}"
+    implementation 'net.dirtcraft:api'
+}

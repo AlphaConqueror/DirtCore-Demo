@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2025 Marc Beckhaeuser (AlphaConqueror) <marcbeckhaeuser@gmail.com>
+ *
+ * Created for 'DirtCraft'.
+ *
+ * ALL RIGHTS RESERVED.
+ */
+
+package net.dirtcraft.dirtcore.common.dependencies.relocation;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import net.dirtcraft.dirtcore.common.dependencies.Dependency;
+import net.dirtcraft.dirtcore.common.dependencies.DependencyManager;
+import net.dirtcraft.dirtcore.common.dependencies.classloader.IsolatedClassLoader;
+
+/**
+ * Handles class runtime relocation of packages in downloaded dependencies
+ */
+public class RelocationHandler {
+
+    public static final Set<Dependency> DEPENDENCIES =
+            EnumSet.of(Dependency.ASM, Dependency.ASM_COMMONS, Dependency.JAR_RELOCATOR);
+    private static final String JAR_RELOCATOR_CLASS = "me.lucko.jarrelocator.JarRelocator";
+    private static final String JAR_RELOCATOR_RUN_METHOD = "run";
+
+    private final Constructor<?> jarRelocatorConstructor;
+    private final Method jarRelocatorRunMethod;
+
+    public RelocationHandler(final DependencyManager dependencyManager) {
+        ClassLoader classLoader = null;
+
+        try {
+            // download the required dependencies for remapping
+            dependencyManager.loadDependencies(DEPENDENCIES);
+            // get a classloader containing the required dependencies as sources
+            classLoader = dependencyManager.obtainClassLoaderWith(DEPENDENCIES);
+
+            // load the relocator class
+            final Class<?> jarRelocatorClass = classLoader.loadClass(JAR_RELOCATOR_CLASS);
+
+            // prepare the reflected constructor & method instances
+            this.jarRelocatorConstructor =
+                    jarRelocatorClass.getDeclaredConstructor(File.class, File.class, Map.class);
+            this.jarRelocatorConstructor.setAccessible(true);
+
+            this.jarRelocatorRunMethod =
+                    jarRelocatorClass.getDeclaredMethod(JAR_RELOCATOR_RUN_METHOD);
+            this.jarRelocatorRunMethod.setAccessible(true);
+        } catch (final Exception e) {
+            try {
+                if (classLoader instanceof IsolatedClassLoader) {
+                    ((IsolatedClassLoader) classLoader).close();
+                }
+            } catch (final IOException ex) {
+                e.addSuppressed(ex);
+            }
+
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void remap(final Path input, final Path output,
+            final List<Relocation> relocations) throws Exception {
+        final Map<String, String> mappings = new HashMap<>();
+        for (final Relocation relocation : relocations) {
+            mappings.put(relocation.getPattern(), relocation.getRelocatedPattern());
+        }
+
+        // create and invoke a new relocator
+        final Object relocator =
+                this.jarRelocatorConstructor.newInstance(input.toFile(), output.toFile(), mappings);
+        this.jarRelocatorRunMethod.invoke(relocator);
+    }
+
+}

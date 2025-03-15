@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2025 Marc Beckhaeuser (AlphaConqueror) <marcbeckhaeuser@gmail.com>
+ *
+ * Created for 'DirtCraft'.
+ *
+ * ALL RIGHTS RESERVED.
+ */
+
+package net.dirtcraft.dirtcore.common.event.internal.player;
+
+import java.util.UUID;
+import net.dirtcraft.dirtcore.api.event.DirtCoreEvent;
+import net.dirtcraft.dirtcore.api.event.type.Cancellable;
+import net.dirtcraft.dirtcore.api.event.util.Param;
+import net.dirtcraft.dirtcore.common.model.minecraft.Block;
+import net.dirtcraft.dirtcore.common.model.minecraft.item.ItemStack;
+import net.dirtcraft.dirtcore.common.model.minecraft.phys.BlockPos;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+public interface PlayerInteractEvent extends DirtCoreEvent, Cancellable {
+
+    @Param(0)
+    @NonNull Type getType();
+
+    @Param(1)
+    @NonNull UUID getUniqueId();
+
+    @Param(2)
+    @NonNull String getUsername();
+
+    @Param(3)
+    @NonNull BlockPos getPos();
+
+    @Param(4)
+    @NonNull ItemStack getItemStack();
+
+    @Param(5)
+    @NonNull Block getBlock();
+
+    enum Type {
+
+        ENTITY_INTERACT,
+        ENTITY_INTERACT_SPECIFIC,
+        LEFT_CLICK_BLOCK,
+        RIGHT_CLICK_BLOCK,
+        RIGHT_CLICK_BLOCK_PLACE,
+        RIGHT_CLICK_ITEM
+    }
+}

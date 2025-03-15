@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+    id 'org.cadixdev.licenser' version '0.6.1' apply false
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+allprojects {
+    project.ext.dirtcoreDir = rootProject.projectDir.parentFile
+}
+
+apply from: file("${project.ext.dirtcoreDir}/config.gradle")

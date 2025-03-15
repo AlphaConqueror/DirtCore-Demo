@@ -1,0 +1,46 @@
+{
+  "mappings": {
+    "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinBlockPistonBase": {
+      "canPush": "Lnet/minecraft/block/BlockPistonBase;func_185646_a(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;ZLnet/minecraft/util/EnumFacing;)Z"
+    },
+    "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinContainer": {
+      "slotClick": "Lnet/minecraft/inventory/Container;func_184996_a(IILnet/minecraft/inventory/ClickType;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"
+    },
+    "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinContainerAccessor": {
+      "listeners": "Lnet/minecraft/inventory/Container;field_75149_d:Ljava/util/List;"
+    },
+    "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinPlayerLoginNegotiation": {
+      "Lnet/minecraft/server/management/PlayerList;sendMessage(Lnet/minecraft/util/text/ITextComponent;)V": "Lnet/minecraft/server/management/PlayerList;func_148539_a(Lnet/minecraft/util/text/ITextComponent;)V"
+    },
+    "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinWorld": {
+      "setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z": "Lnet/minecraft/world/World;func_180501_a(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z"
+    },
+    "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinNetHandlerPlayServer": {
+      "onDisconnect": "Lnet/minecraft/network/NetHandlerPlayServer;func_147231_a(Lnet/minecraft/util/text/ITextComponent;)V",
+      "Lnet/minecraft/server/management/PlayerList;sendMessage(Lnet/minecraft/util/text/ITextComponent;)V": "Lnet/minecraft/server/management/PlayerList;func_148539_a(Lnet/minecraft/util/text/ITextComponent;)V"
+    }
+  },
+  "data": {
+    "searge": {
+      "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinBlockPistonBase": {
+        "canPush": "Lnet/minecraft/block/BlockPistonBase;func_185646_a(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;ZLnet/minecraft/util/EnumFacing;)Z"
+      },
+      "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinContainer": {
+        "slotClick": "Lnet/minecraft/inventory/Container;func_184996_a(IILnet/minecraft/inventory/ClickType;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"
+      },
+      "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinContainerAccessor": {
+        "listeners": "Lnet/minecraft/inventory/Container;field_75149_d:Ljava/util/List;"
+      },
+      "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinPlayerLoginNegotiation": {
+        "Lnet/minecraft/server/management/PlayerList;sendMessage(Lnet/minecraft/util/text/ITextComponent;)V": "Lnet/minecraft/server/management/PlayerList;func_148539_a(Lnet/minecraft/util/text/ITextComponent;)V"
+      },
+      "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinWorld": {
+        "setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z": "Lnet/minecraft/world/World;func_180501_a(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z"
+      },
+      "net/dirtcraft/dirtcore/forge_1_12_2/loader/mixins/MixinNetHandlerPlayServer": {
+        "onDisconnect": "Lnet/minecraft/network/NetHandlerPlayServer;func_147231_a(Lnet/minecraft/util/text/ITextComponent;)V",
+        "Lnet/minecraft/server/management/PlayerList;sendMessage(Lnet/minecraft/util/text/ITextComponent;)V": "Lnet/minecraft/server/management/PlayerList;func_148539_a(Lnet/minecraft/util/text/ITextComponent;)V"
+      }
+    }
+  }
+}

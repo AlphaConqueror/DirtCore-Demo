@@ -1,0 +1,17 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "All-rights-reserved"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+
+[[dependencies.${ mod_id }]]
+modId = "luckperms"
+mandatory = false
+versionRange = "[5.4,)"
+ordering = "AFTER"
+side = "SERVER"

@@ -1,0 +1,68 @@
+name: 🐞 Bug report
+description: Report an issue or problem with the way DirtCore is functioning.
+labels: [ "type: issue" ]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: Please provide a short description of the issue in the space below.
+      placeholder: Description goes here!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Reproduction Steps
+      description: Please provide a clear list of steps we should follow in order to reproduce your issue in the space below.
+      placeholder: '1. Go to ...
+      
+      2. Click on ...
+      
+      3. Scroll down to ...
+      
+      4. See error
+      
+      '
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected Behaviour
+      description: Please provide a description of what you expected to happen.
+      placeholder: Describe what you expected to happen here.
+    validations:
+      required: true
+  - type: input
+    id: platform-version
+    attributes:
+      label: Server Details
+      description: On what platform and version are you experiencing the issue?
+      placeholder: ex. Forge 1.20.1 47.2.20
+    validations:
+      required: true
+  - type: input
+    id: dirtcore-version
+    attributes:
+      label: DirtCore Version
+      description: Please provide the specific, precise version number of DirtCore you are using to reproduce this bug.
+      placeholder: ex. 1.20.1-1.2.354
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and Configs
+      description: If you think it would be helpful, please also include a pastebin of any relevant config files or log output. You should use https://gist.github.com/ to upload, then include the link below.
+      placeholder: Logs and configs go here!
+    validations:
+      required: false
+  - type: textarea
+    id: extra-info
+    attributes:
+      label: Extra Details
+      description: Please include any other relevant details in the space below.
+      placeholder: I was able to reproduce this only during a solar eclipse ...
+    validations:
+      required: false

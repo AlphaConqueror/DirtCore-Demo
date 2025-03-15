@@ -1,0 +1,94 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    alias(libs.plugins.neoforgeduserdev)
+    alias(libs.plugins.neoforgedmixin)
+    alias(libs.plugins.shadow)
+}
+
+mixin {
+    config 'dirtcore.mixins.json'
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neo_version}"
+
+    implementation 'net.dirtcraft:api'
+    implementation 'net.dirtcraft:common-loader-utils'
+    implementation project(':neoforge_1_21_1:neoforge-api')
+}
+
+build {
+    dependsOn(":neoforge_1_21_1:neoforge-api:build")
+    dependsOn(":neoforge_1_21_1:build")
+}
+
+tasks.register('processSource', Sync) {
+    outputs.upToDateWhen { false }
+    from sourceSets.main.java
+
+    filter(ReplaceTokens,
+            tokens: [
+                    mod_id           : project.ext.modId,
+                    mod_name         : project.ext.modName,
+                    version          : project.ext.fullVersion,
+                    minecraft_version: project.ext.minecraftVersion
+            ]
+    )
+
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
+processResources {
+    outputs.upToDateWhen { false }
+    // include platform specific files into processing
+    from "${project.ext.dirtcoreDir}/common/loader-utils/src/main/resources"
+
+    filesMatching(['**/neoforge.mods.toml', '**/pack.mcmeta']) {
+        expand 'mod_id': project.ext.modId,
+                'mod_name': project.ext.modName,
+                'mod_authors': project.ext.modAuthors,
+                'mod_description': project.ext.modDescription,
+                'version': project.ext.fullVersion,
+                'minecraft_version': project.ext.minecraftVersion,
+                'loader_version_range': project.ext.loaderVersionRange
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                "Specification-Title"     : project.ext.modId,
+                "Specification-Vendor"    : project.ext.modAuthors,
+                "Specification-Version"   : project.ext.majorVersion,
+                "Implementation-Title"    : project.ext.modName,
+                "Implementation-Version"  : project.ext.fullVersion,
+                "Implementation-Vendor"   : project.ext.modAuthors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+shadowJar {
+    archiveFileName = "DirtCore-NeoForge-${project.ext.minecraftVersion}-${project.ext.fullVersion}.jar"
+
+    from {
+        project(':neoforge_1_21_1').tasks.shadowJar.archiveFile
+    }
+
+    dependencies {
+        include(dependency('net.dirtcraft:.*'))
+    }
+
+    exclude '**/META-INF/mods.toml'
+    exclude '**/mcmod.info'
+    exclude '**/plugin.yml'
+}
+
+artifacts {
+    archives shadowJar
+}

@@ -1,0 +1,68 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "https://maven.minecraftforge.net/" }
+    }
+    dependencies {
+        classpath('com.anatawa12.forge:ForgeGradle:1.2-1.1.+') {
+            changing = true
+        }
+    }
+}
+
+plugins {
+    id 'org.cadixdev.licenser' version '0.6.1' apply false
+    id 'java-library'
+    id 'maven-publish'
+}
+
+apply plugin: 'forge'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+allprojects {
+    project.ext.mappingVersion = mapping_version
+    project.ext.mappingChannel = mapping_channel
+    project.ext.minecraftVersion = minecraft_version
+    project.ext.loaderVersion = loader_version_range
+}
+
+minecraft {
+    version = project.ext.mappingVersion
+    mappings = project.ext.mappingChannel
+}
+
+dependencies {
+    api('net.dirtcraft:common') {
+        exclude(module: 'gson') // we need to use MC Gson classes
+        exclude(module: 'log4j-api') // we need to use MC Log4j for logging
+        exclude(module: 'log4j-core') // we need to use MC Log4j for logging
+    }
+
+    api 'net.dirtcraft:common-loader-utils'
+    api project(':forge-legacy-utils')
+    api project(':forge_1_7_10:forge-api')
+}
+
+tasks.register('processSource', Sync) {
+    outputs.upToDateWhen { false }
+    from sourceSets.main.java
+
+    filter(ReplaceTokens,
+            tokens: [
+                    mod_id           : project.ext.modId,
+                    mod_name         : project.ext.modName,
+                    version          : project.ext.fullVersion,
+                    minecraft_version: project.ext.minecraftVersion
+            ]
+    )
+
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}

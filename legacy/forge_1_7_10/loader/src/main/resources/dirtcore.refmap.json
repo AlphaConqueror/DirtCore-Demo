@@ -1,0 +1,50 @@
+{
+  "mappings": {
+    "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinBlockPistonBase": {
+      "canPushBlock": "Lnet/minecraft/block/BlockPistonBase;func_150080_a(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIIZ)Z"
+    },
+    "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinContainer": {
+      "slotClick": "Lnet/minecraft/inventory/Container;func_75144_a(IIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"
+    },
+    "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinContainerAccessor": {
+      "crafters": "Lnet/minecraft/inventory/Container;field_75149_d:Ljava/util/List;"
+    },
+    "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinServerConfigurationManager": {
+      "allowUserToConnect": "Lnet/minecraft/server/management/ServerConfigurationManager;func_148542_a(Ljava/net/SocketAddress;Lcom/mojang/authlib/GameProfile;)Ljava/lang/String;",
+      "Lnet/minecraft/server/management/ServerConfigurationManager;sendChatMsg(Lnet/minecraft/util/IChatComponent;)V": "Lnet/minecraft/server/management/ServerConfigurationManager;func_148539_a(Lnet/minecraft/util/IChatComponent;)V"
+    },
+    "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinWorld": {
+      "setBlock(IIILnet/minecraft/block/Block;II)Z": "Lnet/minecraft/world/World;func_147465_d(IIILnet/minecraft/block/Block;II)Z",
+      "Lnet/minecraft/world/chunk/Chunk;getBlock(III)Lnet/minecraft/block/Block;": "Lnet/minecraft/world/chunk/Chunk;func_150810_a(III)Lnet/minecraft/block/Block;"
+    },
+    "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinNetHandlerPlayServer": {
+      "onDisconnect": "Lnet/minecraft/network/NetHandlerPlayServer;func_147231_a(Lnet/minecraft/util/IChatComponent;)V",
+      "Lnet/minecraft/server/management/ServerConfigurationManager;sendChatMsg(Lnet/minecraft/util/IChatComponent;)V": "Lnet/minecraft/server/management/ServerConfigurationManager;func_148539_a(Lnet/minecraft/util/IChatComponent;)V"
+    }
+  },
+  "data": {
+    "searge": {
+      "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinBlockPistonBase": {
+        "canPushBlock": "Lnet/minecraft/block/BlockPistonBase;func_150080_a(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIIZ)Z"
+      },
+      "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinContainer": {
+        "slotClick": "Lnet/minecraft/inventory/Container;func_75144_a(IIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"
+      },
+      "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinContainerAccessor": {
+        "crafters": "Lnet/minecraft/inventory/Container;field_75149_d:Ljava/util/List;"
+      },
+      "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinServerConfigurationManager": {
+        "allowUserToConnect": "Lnet/minecraft/server/management/ServerConfigurationManager;func_148542_a(Ljava/net/SocketAddress;Lcom/mojang/authlib/GameProfile;)Ljava/lang/String;",
+        "sendChatMsgImpl": "Lnet/minecraft/server/management/ServerConfigurationManager;func_148544_a(Lnet/minecraft/util/IChatComponent;Z)V"
+      },
+      "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinWorld": {
+        "setBlock(IIILnet/minecraft/block/Block;II)Z": "Lnet/minecraft/world/World;func_147465_d(IIILnet/minecraft/block/Block;II)Z",
+        "Lnet/minecraft/world/chunk/Chunk;getBlock(III)Lnet/minecraft/block/Block;": "Lnet/minecraft/world/chunk/Chunk;func_150810_a(III)Lnet/minecraft/block/Block;"
+      },
+      "net/dirtcraft/dirtcore/forge_1_7_10/loader/mixins/MixinNetHandlerPlayServer": {
+        "onDisconnect": "Lnet/minecraft/network/NetHandlerPlayServer;func_147231_a(Lnet/minecraft/util/IChatComponent;)V",
+        "Lnet/minecraft/server/management/ServerConfigurationManager;sendChatMsg(Lnet/minecraft/util/IChatComponent;)V": "Lnet/minecraft/server/management/ServerConfigurationManager;func_148539_a(Lnet/minecraft/util/IChatComponent;)V"
+      }
+    }
+  }
+}

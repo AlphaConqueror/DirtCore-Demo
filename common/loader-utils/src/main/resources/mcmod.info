@@ -1,0 +1,20 @@
+[
+  {
+    "modid": "${mod_id}",
+    "name": "${mod_name}",
+    "description": "${mod_description}",
+    "mcversion": "${minecraft_version}",
+    "version": "${version}",
+    "authors": [
+      "${mod_authors}"
+    ],
+    "requiredMods": [
+      "Forge"
+    ],
+    "dependencies": [
+      "Forge"
+    ],
+    "dependants": [],
+    "useDependencyInformation": true
+  }
+]

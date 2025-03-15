@@ -1,0 +1,114 @@
+import java.time.Year
+
+defaultTasks 'licenseFormat', 'build'
+
+final def ROOT_DIR = findProperty('dirtcoreDir') ?: rootProject.projectDir
+final def PROPS = new Properties()
+final def PROPERTIES_PATH = 'gradle.properties'
+final def ENV_PATH = '.env'
+final def HEADER_PATH = 'HEADER.txt'
+final def LICENSE_PATH = 'LICENSE.txt'
+final def determinePatchVersion = {
+    // get the name of the last tag
+    def tagInfo = new ByteArrayOutputStream()
+
+    exec {
+        // this is buggy sometimes: add or remove 'cmd'
+        commandLine 'git', 'rev-list', 'HEAD', '--count'
+        standardOutput = tagInfo
+    }
+
+    return tagInfo.toString().replace('\n', '')
+}
+
+file("${ROOT_DIR}/${PROPERTIES_PATH}").withInputStream { PROPS.load(it) }
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'org.cadixdev.licenser'
+
+    // read environment from .env
+    File envFile = file("${ROOT_DIR}/${ENV_PATH}")
+
+    if (!envFile.exists()) {
+        throw new GradleException("Missing .env file: ${envFile.absolutePath}")
+    }
+
+    // this somehow causes a lot of warnings at unrelated locations
+    project.ext.envMap = new HashMap<String, String>()
+
+    if (envFile.exists()) {
+        envFile.readLines().each() {
+            if (!it.isEmpty() && !it.startsWith('#')) {
+                def (key, value) = it.tokenize('=')
+                project.ext.envMap[key] = value
+            }
+        }
+    }
+
+    if (project.ext.envMap.isEmpty()) {
+        throw new GradleException("Environment variables failed to load from: ${envFile.absolutePath}")
+    }
+
+    project.ext.modId = PROPS.getProperty('mod_id')
+    project.ext.modName = PROPS.getProperty('mod_name')
+    project.ext.modAuthors = PROPS.getProperty('mod_authors')
+    project.ext.modDescription = PROPS.getProperty('mod_description')
+    project.ext.majorVersion = PROPS.getProperty('mod_version_major')
+    project.ext.minorVersion = PROPS.getProperty('mod_version_minor')
+    project.ext.patchVersion = determinePatchVersion()
+    project.ext.apiVersion = project.ext.majorVersion + '.' + project.ext.minorVersion
+    project.ext.fullVersion = project.ext.apiVersion + '.' + project.ext.patchVersion
+
+    group = 'net.dirtcraft'
+    version = project.ext.apiVersion
+
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/DirtNetwork/StorageUtils")
+
+            credentials {
+                username = envMap['USERNAME']
+                password = envMap['TOKEN']
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    jar {
+        from "${ROOT_DIR}/${LICENSE_PATH}"
+    }
+
+    def checkLicenseUpToDate = { path ->
+        if (!file(path).readLines().stream().anyMatch { it.contains(Year.now().toString()) }) {
+            throw new Exception("${path} does not contain current year.")
+        }
+    }
+
+    checkLicenseUpToDate("${ROOT_DIR}/${HEADER_PATH}")
+    checkLicenseUpToDate("${ROOT_DIR}/${LICENSE_PATH}")
+
+    license {
+        header = file("${ROOT_DIR}/${LICENSE_PATH}")
+        include '**/*.java'
+        newLine = true
+    }
+
+    javadoc {
+        title = "${project.ext.modId} (v ${project.ext.apiVersion})"
+        options.encoding = 'UTF-8'
+        options.charSet = 'UTF-8'
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+}

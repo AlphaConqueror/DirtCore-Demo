@@ -1,0 +1,77 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+sourceCompatibility = 17
+targetCompatibility = 17
+
+allprojects {
+    project.ext.minecraftVersion = minecraft_version
+    project.ext.loaderVersionRange = loader_version_range
+}
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    implementation 'net.dirtcraft:common'
+    compileOnly 'net.dirtcraft:common-loader-utils'
+}
+
+tasks.register('processSource', Sync) {
+    outputs.upToDateWhen { false }
+    from sourceSets.main.java
+
+    filter(ReplaceTokens,
+            tokens: [
+                    mod_id           : project.ext.modId,
+                    mod_name         : project.ext.modName,
+                    version          : project.ext.fullVersion,
+                    minecraft_version: project.ext.minecraftVersion
+            ]
+    )
+
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
+reobf {
+    shadowJar {}
+}
+
+shadowJar {
+    archiveFileName = "DirtCore-Forge-${minecraft_version}.jarinjar"
+
+    dependencies {
+        include(dependency('de.alphaconqueror:.*'))
+        include(dependency('net.dirtcraft:.*'))
+        include(dependency('net.dirtcraft.dirtbot:.*'))
+    }
+
+    relocate 'net.bytebuddy', 'net.dirtcraft.dirtcore.lib.bytebuddy'
+    relocate 'net.kyori.adventure', 'net.dirtcraft.dirtcore.lib.adventure'
+    relocate 'net.kyori.event', 'net.dirtcraft.dirtcore.lib.event'
+    relocate 'com.github.benmanes.caffeine', 'net.dirtcraft.dirtcore.lib.caffeine'
+    relocate 'com.zaxxer.hikari', 'net.dirtcraft.dirtcore.lib.hikari'
+    relocate 'com.typesafe', 'net.dirtcraft.dirtcore.lib.typesafe'
+    relocate 'de.alphaconqueror', 'net.dirtcraft.dirtcore.lib.alphaconqueror'
+    //relocate 'javax.persistence', 'net.dirtcraft.dirtcore.libs.persistence'
+    relocate 'net.dv8tion.jda', 'net.dirtcraft.dirtcore.lib.jda'
+    relocate 'ninja.leaping.configurate', 'net.dirtcraft.dirtcore.lib.configurate'
+    //relocate 'org.hibernate', 'net.dirtcraft.dirtcore.lib.hibernate'
+    relocate 'org.mariadb.jdbc', 'net.dirtcraft.dirtcore.lib.mariadb'
+}
+
+artifacts {
+    archives shadowJar
+}

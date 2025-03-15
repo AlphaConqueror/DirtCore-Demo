@@ -1,0 +1,280 @@
+/*
+ * Copyright (c) 2025 Marc Beckhaeuser (AlphaConqueror) <marcbeckhaeuser@gmail.com>
+ *
+ * Created for 'DirtCraft'.
+ *
+ * ALL RIGHTS RESERVED.
+ */
+
+package net.dirtcraft.dirtcore.common.pagination;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+import net.dirtcraft.dirtcore.common.pagination.context.PaginationContext;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.examination.Examinable;
+import net.kyori.examination.ExaminableProperty;
+import net.kyori.examination.string.StringExaminer;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
+
+public final class PaginationImpl<T> implements Examinable, Pagination<T> {
+
+    private static final int LINE_CHARACTER_LENGTH = 1;
+
+    private final int width;
+    private final int resultsPerPage;
+
+    private final Renderer renderer;
+
+    private final char lineCharacter;
+    private final Style lineStyle;
+
+    private final char previousPageButtonCharacter;
+    private final Style previousPageButtonStyle;
+    private final char nextPageButtonCharacter;
+    private final Style nextPageButtonStyle;
+
+    private final Component title;
+    private final Renderer.RowRenderer<T> rowRenderer;
+    private final PageCommandFunction pageCommand;
+    private final boolean addEmptyLine;
+
+    PaginationImpl(final int width, final int resultsPerPage, final @NotNull Renderer renderer,
+            final char lineCharacter, final @NotNull Style lineStyle,
+            final char previousPageButtonCharacter, final @NotNull Style previousPageButtonStyle,
+            final char nextPageButtonCharacter, final @NotNull Style nextPageButtonStyle,
+            final @NotNull Component title, final Renderer.@NotNull RowRenderer<T> rowRenderer,
+            final @NotNull PageCommandFunction pageCommand, final boolean addEmptyLine) {
+        this.width = width;
+        this.resultsPerPage = resultsPerPage;
+        this.renderer = renderer;
+        this.lineCharacter = lineCharacter;
+        this.lineStyle = lineStyle;
+        this.previousPageButtonCharacter = previousPageButtonCharacter;
+        this.previousPageButtonStyle = previousPageButtonStyle;
+        this.nextPageButtonCharacter = nextPageButtonCharacter;
+        this.nextPageButtonStyle = nextPageButtonStyle;
+        this.title = title;
+        this.rowRenderer = rowRenderer;
+        this.pageCommand = pageCommand;
+        this.addEmptyLine = addEmptyLine;
+    }
+
+    static int length(final @NotNull Component component) {
+        int length = 0;
+        if (component instanceof TextComponent) {
+            length += ((TextComponent) component).content().length();
+        }
+        for (final Component child : component.children()) {
+            length += length(child);
+        }
+        return length;
+    }
+
+    static @NotNull String repeat(final @NotNull String character, final int count) {
+        return String.join("", Collections.nCopies(count, character));
+    }
+
+    static int pages(final int pageSize, final int count) {
+        final int pages = count / pageSize + 1;
+        if (count % pageSize == 0) {
+            return pages - 1;
+        }
+        return pages;
+    }
+
+    static boolean pageInRange(final int page, final int pages) {
+        return page > 0 && page <= pages;
+    }
+
+    @Override
+    public @NotNull List<Component> render(@NonNull final PaginationContext context,
+            final @NotNull Collection<? extends T> content, final int page) {
+        return this.render(context, Collections.emptySet(), content, page);
+    }
+
+    @Override
+    public @NotNull List<Component> render(@NonNull final PaginationContext context,
+            @NonNull final Collection<Component> insert,
+            @NotNull final Collection<? extends T> content, final int page) {
+        if (content.isEmpty()) {
+            return Collections.singletonList(this.renderer.renderEmpty());
+        }
+
+        final int pages = pages(this.resultsPerPage, content.size());
+
+        if (!pageInRange(page, pages)) {
+            return Collections.singletonList(this.renderer.renderUnknownPage(page, pages));
+        }
+
+        final List<Component> components = new ArrayList<>();
+
+        components.add(this.renderHeader(page, pages));
+        components.addAll(insert);
+        components.add(Component.empty());
+        Paginator.forEachPageEntry(content, this.resultsPerPage, page,
+                (value, index) -> components.addAll(
+                        this.rowRenderer.renderRow(context, value, index)));
+
+        if (this.addEmptyLine) {
+            components.add(Component.empty());
+        }
+
+        components.add(this.renderFooter(page, pages));
+        return Collections.unmodifiableList(components);
+    }
+
+    @Override
+    public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
+        return Stream.of(ExaminableProperty.of("width", this.width),
+                ExaminableProperty.of("resultsPerPage", this.resultsPerPage),
+                ExaminableProperty.of("renderer", this.renderer),
+                ExaminableProperty.of("lineCharacter", this.lineCharacter),
+                ExaminableProperty.of("lineStyle", this.lineStyle),
+                ExaminableProperty.of("previousPageButtonCharacter",
+                        this.previousPageButtonCharacter),
+                ExaminableProperty.of("previousPageButtonStyle", this.previousPageButtonStyle),
+                ExaminableProperty.of("nextPageButtonCharacter", this.nextPageButtonCharacter),
+                ExaminableProperty.of("nextPageButtonStyle", this.nextPageButtonStyle),
+                ExaminableProperty.of("title", this.title),
+                ExaminableProperty.of("rowRenderer", this.rowRenderer),
+                ExaminableProperty.of("pageCommand", this.pageCommand),
+                ExaminableProperty.of("addEmptyLine", this.addEmptyLine));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = this.width;
+        result = (31 * result) + this.resultsPerPage;
+        result = (31 * result) + this.renderer.hashCode();
+        result = (31 * result) + (int) this.lineCharacter;
+        result = (31 * result) + this.lineStyle.hashCode();
+        result = (31 * result) + (int) this.previousPageButtonCharacter;
+        result = (31 * result) + this.previousPageButtonStyle.hashCode();
+        result = (31 * result) + (int) this.nextPageButtonCharacter;
+        result = (31 * result) + this.nextPageButtonStyle.hashCode();
+        result = (31 * result) + this.title.hashCode();
+        result = (31 * result) + this.rowRenderer.hashCode();
+        result = (31 * result) + this.pageCommand.hashCode();
+        result = (31 * result) + Boolean.hashCode(this.addEmptyLine);
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || this.getClass() != other.getClass()) {
+            return false;
+        }
+        final PaginationImpl<?> that = (PaginationImpl<?>) other;
+        if (this.width != that.width) {
+            return false;
+        }
+        if (this.resultsPerPage != that.resultsPerPage) {
+            return false;
+        }
+        if (this.lineCharacter != that.lineCharacter) {
+            return false;
+        }
+        if (this.previousPageButtonCharacter != that.previousPageButtonCharacter) {
+            return false;
+        }
+        if (this.nextPageButtonCharacter != that.nextPageButtonCharacter) {
+            return false;
+        }
+        if (!this.renderer.equals(that.renderer)) {
+            return false;
+        }
+        if (!this.lineStyle.equals(that.lineStyle)) {
+            return false;
+        }
+        if (!this.previousPageButtonStyle.equals(that.previousPageButtonStyle)) {
+            return false;
+        }
+        if (!this.nextPageButtonStyle.equals(that.nextPageButtonStyle)) {
+            return false;
+        }
+        if (!this.title.equals(that.title)) {
+            return false;
+        }
+        if (!this.rowRenderer.equals(that.rowRenderer)) {
+            return false;
+        }
+        if (!this.pageCommand.equals(that.pageCommand)) {
+            return false;
+        }
+        return this.addEmptyLine == that.addEmptyLine;
+    }
+
+    @Override
+    public String toString() {
+        return StringExaminer.simpleEscaping().examine(this);
+    }
+
+    private Component renderHeader(final int page, final int pages) {
+        final Component header = this.renderer.renderHeader(this.title, page, pages);
+        final Component dashes = this.line(header);
+
+        return Component.text()
+                .append(dashes)
+                .append(header)
+                .append(dashes).build();
+    }
+
+    private Component renderFooter(final int page, final int pages) {
+        if (page == 1 && page == pages) {
+            return this.line(this.width);
+        }
+
+        final Component buttons = this.renderFooterButtons(page, pages);
+        final Component dashes = this.line(buttons);
+
+        return Component.text()
+                .append(dashes)
+                .append(buttons)
+                .append(dashes).build();
+    }
+
+    private Component renderFooterButtons(final int page, final int pages) {
+        final boolean hasPreviousPage = page > 1 && pages > 1;
+        final boolean hasNextPage =
+                (page < pages && page == 1) || (hasPreviousPage && page != pages);
+        final TextComponent.Builder buttons = Component.text();
+
+        if (hasPreviousPage) {
+            buttons.append(this.renderer.renderPreviousPageButton(this.previousPageButtonCharacter,
+                    this.previousPageButtonStyle,
+                    ClickEvent.runCommand(this.pageCommand.pageCommand(page - 1))));
+
+            if (hasNextPage) {
+                buttons.append(this.line(8));
+            }
+        }
+
+        if (hasNextPage) {
+            buttons.append(this.renderer.renderNextPageButton(this.nextPageButtonCharacter,
+                    this.nextPageButtonStyle,
+                    ClickEvent.runCommand(this.pageCommand.pageCommand(page + 1))));
+        }
+
+        return buttons.build();
+    }
+
+    private @NotNull Component line(final @NotNull Component component) {
+        return this.line((this.width - length(component)) / (LINE_CHARACTER_LENGTH * 2));
+    }
+
+    private @NotNull Component line(final int characters) {
+        return Component.text(repeat(String.valueOf(this.lineCharacter), characters),
+                this.lineStyle);
+    }
+}

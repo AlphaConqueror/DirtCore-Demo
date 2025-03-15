@@ -1,0 +1,46 @@
+{
+  "mappings": {
+    "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinAbstractContainerMenu": {
+      "doClick": "Lnet/minecraft/world/inventory/AbstractContainerMenu;m_150430_(IILnet/minecraft/world/inventory/ClickType;Lnet/minecraft/world/entity/player/Player;)V"
+    },
+    "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinBlockBehaviour$BlockStateBase": {
+      "getPistonPushReaction": "m_60811_"
+    },
+    "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinLevel": {
+      "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z": "m_6933_(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+      "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;": "Lnet/minecraft/world/level/block/state/BlockState;m_60734_()Lnet/minecraft/world/level/block/Block;",
+      "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;": "Lnet/minecraft/world/level/Level;m_8055_(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"
+    },
+    "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinPlayerList": {
+      "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;)V": "m_11261_(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;)V",
+      "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V": "Lnet/minecraft/server/players/PlayerList;m_240416_(Lnet/minecraft/network/chat/Component;Z)V"
+    },
+    "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinServerGamePacketListenerImpl": {
+      "onDisconnect": "m_7026_",
+      "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V": "Lnet/minecraft/server/players/PlayerList;m_240416_(Lnet/minecraft/network/chat/Component;Z)V"
+    }
+  },
+  "data": {
+    "searge": {
+      "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinAbstractContainerMenu": {
+        "doClick": "Lnet/minecraft/world/inventory/AbstractContainerMenu;m_150430_(IILnet/minecraft/world/inventory/ClickType;Lnet/minecraft/world/entity/player/Player;)V"
+      },
+      "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinBlockBehaviour$BlockStateBase": {
+        "getPistonPushReaction": "m_60811_"
+      },
+      "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinLevel": {
+        "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z": "m_6933_(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+        "Lnet/minecraft/world/level/block/state/BlockState;getBlock()Lnet/minecraft/world/level/block/Block;": "Lnet/minecraft/world/level/block/state/BlockState;m_60734_()Lnet/minecraft/world/level/block/Block;",
+        "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;": "Lnet/minecraft/world/level/Level;m_8055_(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"
+      },
+      "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinPlayerList": {
+        "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;)V": "m_11261_(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;)V",
+        "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V": "Lnet/minecraft/server/players/PlayerList;m_240416_(Lnet/minecraft/network/chat/Component;Z)V"
+      },
+      "net/dirtcraft/dirtcore/forge_1_20_1/loader/mixins/MixinServerGamePacketListenerImpl": {
+        "onDisconnect": "m_7026_",
+        "Lnet/minecraft/server/players/PlayerList;broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V": "Lnet/minecraft/server/players/PlayerList;m_240416_(Lnet/minecraft/network/chat/Component;Z)V"
+      }
+    }
+  }
+}

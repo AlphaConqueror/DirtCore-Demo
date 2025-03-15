@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "https://maven.minecraftforge.net/" }
+    }
+    dependencies {
+        classpath('com.anatawa12.forge:ForgeGradle:1.2-1.1.+') {
+            changing = true
+        }
+    }
+}
+
+plugins {
+    id 'org.cadixdev.licenser' version '0.6.1' apply false
+    id 'java-library'
+    id 'maven-publish'
+}
+
+apply plugin: 'forge'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    version = project.ext.mappingVersion
+    mappings = project.ext.mappingChannel
+}
+
+dependencies {
+    compileOnly 'org.checkerframework:checker-qual:3.21.2'
+    implementation 'net.dirtcraft:api'
+    api 'net.dirtcraft:common-loader-utils'
+}

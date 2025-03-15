@@ -1,0 +1,16 @@
+apply plugin: 'net.minecraftforge.gradle'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    compileOnly 'org.checkerframework:checker-qual:3.21.2'
+    implementation 'net.dirtcraft:api'
+    api 'net.dirtcraft:common-loader-utils'
+}

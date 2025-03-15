@@ -1,0 +1,102 @@
+/*
+ * Copyright (c) 2025 Marc Beckhaeuser (AlphaConqueror) <marcbeckhaeuser@gmail.com>
+ *
+ * Created for 'DirtCraft'.
+ *
+ * ALL RIGHTS RESERVED.
+ */
+
+package net.dirtcraft.dirtcore.common.dependencies;
+
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
+import com.google.gson.JsonElement;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import net.dirtcraft.dirtcore.common.dependencies.relocation.Relocation;
+import net.dirtcraft.dirtcore.common.dependencies.relocation.RelocationHandler;
+import net.dirtcraft.storageutils.StorageType;
+
+/**
+ * Applies DirtCore specific behaviour for {@link Dependency}s.
+ */
+public class DependencyRegistry {
+
+    private static final SetMultimap<StorageType, Dependency> STORAGE_DEPENDENCIES =
+            ImmutableSetMultimap.<StorageType, Dependency>builder()
+                    .putAll(StorageType.MARIADB, Dependency.SLF4J_API, Dependency.SLF4J_SIMPLE,
+                            Dependency.HIKARI, Dependency.MARIADB_DRIVER)
+                    .putAll(StorageType.MYSQL, Dependency.SLF4J_API, Dependency.SLF4J_SIMPLE,
+                            Dependency.HIKARI, Dependency.MYSQL_DRIVER).build();
+
+    public DependencyRegistry() {}
+
+    @SuppressWarnings("ConstantConditions")
+    public static boolean isGsonRelocated() {
+        return JsonElement.class.getName().startsWith("net.dirtcraft");
+    }
+
+    private static boolean classExists(final String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (final ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private static boolean slf4jPresent() {
+        return classExists("org.slf4j.Logger") && classExists("org.slf4j.LoggerFactory");
+    }
+
+    public Set<Dependency> resolveStorageDependencies(final Set<StorageType> storageTypes) {
+        final Set<Dependency> dependencies = new LinkedHashSet<>();
+
+        for (final StorageType storageType : storageTypes) {
+            dependencies.addAll(STORAGE_DEPENDENCIES.get(storageType));
+        }
+
+        dependencies.add(Dependency.JAVAX_PERSISTENCE);
+        dependencies.add(Dependency.HIBERNATE_CORE);
+        dependencies.add(Dependency.HIBERNATE_COMMONS_ANNOTATIONS);
+        dependencies.add(Dependency.ANTLR);
+        dependencies.add(Dependency.FASTERXML_CLASSMATE);
+        dependencies.add(Dependency.DOM4J);
+        dependencies.add(Dependency.JAVASSIST);
+        dependencies.add(Dependency.GERONIMO);
+        dependencies.add(Dependency.JAKARTA_XML_BIND);
+        dependencies.add(Dependency.JBOSS_LOGGING);
+
+        // don't load slf4j if it's already present
+        if ((dependencies.contains(Dependency.SLF4J_API) || dependencies.contains(
+                Dependency.SLF4J_SIMPLE)) && slf4jPresent()) {
+            dependencies.remove(Dependency.SLF4J_API);
+            dependencies.remove(Dependency.SLF4J_SIMPLE);
+        }
+
+        return dependencies;
+    }
+
+    public void applyRelocationSettings(final Dependency dependency,
+            final List<Relocation> relocations) {
+        // support for DirtCore legacy (bukkit 1.7.10)
+        if (!RelocationHandler.DEPENDENCIES.contains(dependency) && isGsonRelocated()) {
+            relocations.add(Relocation.of("guava", "com{}google{}common"));
+            relocations.add(Relocation.of("gson", "com{}google{}gson"));
+        }
+    }
+
+    public boolean shouldAutoLoad(final Dependency dependency) {
+        switch (dependency) {
+            // all used within 'isolated' classloaders, and are therefore not
+            // relocated.
+            case ASM:
+            case ASM_COMMONS:
+            case JAR_RELOCATOR:
+                return false;
+            default:
+                return true;
+        }
+    }
+}

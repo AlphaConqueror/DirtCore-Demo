@@ -1,0 +1,71 @@
+name: Build Gradle
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create .env file
+        run: |
+          touch .env
+          echo USERNAME=${{ secrets.USERNAME }} >> .env
+          echo TOKEN=${{ secrets.TOKEN }} >> .env
+          cat .env
+
+      - name: Validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execution permission
+        run: chmod +x latest/gradlew legacy/gradlew
+
+      - name: Build latest version
+        run: ./gradlew build
+        working-directory: latest
+
+      - name: Set up JDK 8 for legacy version
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Build legacy version
+        run: |
+          ./gradlew :forge_1_7_10:setupCIWorkspace
+          ./gradlew build
+        working-directory: legacy
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p artifacts
+          cp latest/neoforge_1_21_1/loader/build/libs/DirtCore-NeoForge-1.21.1-*.jar artifacts
+          cp latest/forge_1_20_1/loader/build/libs/DirtCore-Forge-1.20.1-*.jar artifacts
+          cp legacy/forge_1_12_2/loader/build/libs/DirtCore-Forge-1.12.2-*.jar artifacts
+          cp legacy/forge_1_7_10/loader/build/libs/DirtCore-Forge-1.7.10-*.jar artifacts
+
+      - name: Upload all artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: artifacts

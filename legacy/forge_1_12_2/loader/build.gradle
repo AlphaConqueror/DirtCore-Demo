@@ -1,0 +1,186 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "https://maven.minecraftforge.net/" }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:5.1.+'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+}
+
+repositories {
+    maven { url 'https://repo.spongepowered.org/maven/' }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
+    testAnnotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
+
+    shade 'net.dirtcraft:api'
+    shade project(':forge_1_12_2')
+
+    shade 'com.zaxxer:HikariCP:4.0.3'
+    shade "org.mariadb.jdbc:mariadb-java-client:3.1.3"
+    shade "mysql:mysql-connector-java:8.0.23"
+
+    shade('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+    }
+}
+
+mixin {
+    config 'dirtcore.mixins.json'
+}
+
+build {
+    dependsOn(":forge_1_12_2:forge-api:build")
+    dependsOn(":forge_1_12_2:build")
+}
+
+tasks.register('processSource', Sync) {
+    outputs.upToDateWhen { false }
+    from sourceSets.main.java
+
+    filter(ReplaceTokens,
+            tokens: [
+                    mod_id           : project.ext.modId,
+                    mod_name         : project.ext.modName,
+                    version          : project.ext.fullVersion,
+                    minecraft_version: project.ext.minecraftVersion
+            ]
+    )
+
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+    options.deprecation = true
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                "Specification-Title"     : project.ext.modId,
+                "Specification-Vendor"    : project.ext.modAuthors,
+                "Specification-Version"   : project.ext.majorVersion,
+                "Implementation-Title"    : project.ext.modName,
+                "Implementation-Version"  : project.ext.fullVersion,
+                "Implementation-Vendor"   : project.ext.modAuthors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "FMLCorePlugin"           : 'net.dirtcraft.dirtcore.forge_1_12_2.loader.ForgeLoaderPluginCore',
+                "TweakClass"              : 'org.spongepowered.asm.launch.MixinTweaker'
+        ])
+    }
+}
+
+processResources {
+    outputs.upToDateWhen { false }
+    // include platform specific files into processing
+    from "${project.ext.dirtcoreDir}/common/loader-utils/src/main/resources"
+
+    filesMatching('**/mcmod.info') {
+        expand 'mod_id': project.ext.modId,
+                'mod_name': project.ext.modName,
+                'mod_authors': project.ext.modAuthors,
+                'mod_description': project.ext.modDescription,
+                'version': project.ext.fullVersion,
+                'minecraft_version': project.ext.minecraftVersion,
+                'loader_version': project.ext.loaderVersion
+    }
+}
+
+reobf {
+    shadowJar {}
+}
+
+shadowJar {
+    archiveFileName = "DirtCore-Forge-${project.ext.minecraftVersion}-${project.ext.fullVersion}.jar"
+
+    dependencies {
+        include(dependency('net.dirtcraft:.*'))
+        include(dependency('de.alphaconqueror:.*'))
+        include(dependency('net.dirtcraft.dirtvotifier:.*'))
+        include(dependency('net.kyori:.*'))
+        include(dependency('com.github.ben-manes.caffeine:.*'))
+        include(dependency('net.bytebuddy:.*'))
+        include(dependency('com.typesafe:.*'))
+        include(dependency('commons-io:.*'))
+        include(dependency('org.hibernate:.*'))
+        include(dependency('org.hibernate.common:.*'))
+        include(dependency('javax.persistence:.*'))
+        include(dependency('jakarta.xml.bind:.*'))
+        include(dependency('org.spongepowered:.*'))
+        include(dependency('com.google.guava:.*'))
+        include(dependency('net.dv8tion:.*'))
+        include(dependency('org.jboss.logging:.*'))
+        include(dependency('org.apache.geronimo.specs:.*'))
+        include(dependency('dom4j:.*'))
+        include(dependency('org.slf4j:.*'))
+        include(dependency('org.apache.commons:.*'))
+        include(dependency('com.squareup.okhttp3:.*'))
+        include(dependency('com.squareup.okio:.*'))
+        include(dependency('org.jetbrains.kotlin:.*'))
+        include(dependency('com.neovisionaries:.*'))
+        include(dependency('com.fasterxml:.*'))
+        include(dependency('org.mariadb.jdbc:.*'))
+        include(dependency('mysql:.*'))
+        include(dependency('org.javassist:.*'))
+        include(dependency('com.fasterxml.jackson.core:.*'))
+        include(dependency('com.zaxxer:.*'))
+        include(dependency('antlr:.*'))
+    }
+
+    relocate 'net.bytebuddy', 'net.dirtcraft.dirtcore.lib.bytebuddy'
+    relocate 'net.kyori.adventure', 'net.dirtcraft.dirtcore.lib.adventure'
+    relocate 'net.kyori.event', 'net.dirtcraft.dirtcore.lib.event'
+    relocate 'com.github.benmanes.caffeine', 'net.dirtcraft.dirtcore.lib.caffeine'
+    relocate 'com.zaxxer.hikari', 'net.dirtcraft.dirtcore.lib.hikari'
+    relocate 'com.typesafe', 'net.dirtcraft.dirtcore.lib.typesafe'
+    relocate 'de.alphaconqueror', 'net.dirtcraft.dirtcore.lib.alphaconqueror'
+    relocate 'javax.persistence', 'net.dirtcraft.dirtcore.lib.persistence'
+    relocate 'net.dv8tion.jda', 'net.dirtcraft.dirtcore.lib.jda'
+    relocate 'ninja.leaping.configurate', 'net.dirtcraft.dirtcore.lib.configurate'
+    relocate 'org.hibernate', 'net.dirtcraft.dirtcore.lib.hibernate'
+    relocate 'org.mariadb.jdbc', 'net.dirtcraft.dirtcore.lib.mariadb'
+    relocate 'org.slf4j', 'net.dirtcraft.dirtcore.lib.slf4j'
+    relocate 'com.mysql', 'net.dirtcraft.dirtcore.lib.mysql'
+    relocate 'com.fasterxml', 'net.dirtcraft.dirtcore.lib.fasterxml'
+    relocate 'com.zaxxer.hikari', 'net.dirtcraft.dirtcore.lib.hikari'
+
+    exclude 'META-INF/versions/**'
+    exclude '**/mods.toml'
+    exclude '**/plugin.yml'
+}
+
+artifacts {
+    archives shadowJar
+}

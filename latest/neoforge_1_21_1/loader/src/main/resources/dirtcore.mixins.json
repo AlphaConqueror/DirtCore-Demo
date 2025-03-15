@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.dirtcraft.dirtcore.neoforge_1_21_1.loader.mixins",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "MixinAbstractContainerMenu",
+    "MixinBlockBehaviour$BlockStateBase",
+    "MixinLevel",
+    "MixinPlayerList",
+    "MixinServerGamePacketListenerImpl",
+    "MixinServerLoginPacketListenerImpl"
+  ],
+  "client": [],
+  "minVersion": "0.8.3"
+}

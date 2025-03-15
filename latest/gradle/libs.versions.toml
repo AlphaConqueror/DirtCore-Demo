@@ -1,0 +1,12 @@
+[versions]
+forgegradle = "[6.0,6.2)"
+licenser = "0.6.1"
+neoforged = "7.0.171"
+shadow = "8.3.0"
+
+[plugins]
+forgegradle = { id = "net.minecraftforge.gradle", version.ref = "forgegradle" }
+licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
+neoforgedmixin = { id = "net.neoforged.gradle.mixin", version.ref = "neoforged" }
+neoforgeduserdev = { id = "net.neoforged.gradle.userdev", version.ref = "neoforged" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

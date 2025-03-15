@@ -1,0 +1,11 @@
+plugins {
+    id 'org.cadixdev.licenser' version '0.6.1' apply false
+    id 'java-library'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    api 'net.dirtcraft:common'
+}
