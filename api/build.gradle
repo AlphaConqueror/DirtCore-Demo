@@ -28,7 +28,7 @@ javadoc {
 publishing {
     repositories {
         maven {
-            url = uri("https://maven.pkg.github.com/DirtNetwork/DirtCore")
+            url = uri("https://maven.pkg.github.com/AlphaConqueror/DirtCore-Demo")
 
             credentials {
                 username = envMap["USERNAME"]

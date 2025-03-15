@@ -72,8 +72,8 @@ included.
 #### Compiling from source
 
 ```sh
-git clone https://github.com/DirtNetwork/DirtCore.git
-cd DirtCore/
+git clone https://github.com/AlphaConqueror/DirtCore-Demo.git
+cd DirtCore-Demo/
 ./gradlew build
 ```
 
